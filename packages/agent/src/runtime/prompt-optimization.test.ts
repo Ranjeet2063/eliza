@@ -380,7 +380,7 @@ describe("installPromptOptimizations", () => {
     expect(payload.maxTokens).toBeUndefined();
     expect(promptOptimizationOf(payload)).toMatchObject({
       outputReserveTokens: 100,
-      budgetTokens: 128_000 - 100,
+      budgetTokens: Math.floor((1_000_000 - 100) * 0.95),
     });
   });
 
@@ -414,7 +414,7 @@ describe("installPromptOptimizations", () => {
     expect(payload.maxTokens).toBeUndefined();
     expect(payload.maxOutputTokens).toBeUndefined();
     expect(promptOptimizationOf(payload)).toMatchObject({
-      budgetTokens: 128_000,
+      budgetTokens: 1_000_000 * 0.95,
     });
     expect(promptOptimizationOf(payload)?.outputReserveTokens).toBeUndefined();
   });

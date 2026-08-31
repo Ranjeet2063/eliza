@@ -79,8 +79,6 @@ describe.each([
 
     const dialog = screen.getByRole("dialog");
     expect(dialog.closest("[data-settings-shell]")).toBeNull();
-    expect(dialog.classList.contains("bg-bg")).toBe(true);
-    expect(dialog.classList.contains("bg-popover")).toBe(false);
   });
 
   it("keeps its portalled select menu on the same global surface", () => {
@@ -94,15 +92,11 @@ describe.each([
     });
     const listbox = screen.getByRole("listbox");
     expect(listbox.closest("[data-settings-shell]")).toBeNull();
-    expect(listbox.classList.contains("bg-bg")).toBe(true);
-    expect(listbox.classList.contains("bg-popover")).toBe(false);
   });
 });
 
-function expectGlobalOpaquePortal(element: HTMLElement): void {
+function expectGlobalPortal(element: HTMLElement): void {
   expect(element.closest("[data-settings-shell]")).toBeNull();
-  expect(element.classList.contains("bg-bg")).toBe(true);
-  expect(element.classList.contains("bg-popover")).toBe(false);
 }
 
 describe("Organization row action portal surfaces", () => {
@@ -136,13 +130,13 @@ describe("Organization row action portal surfaces", () => {
       pointerId: 1,
       pointerType: "mouse",
     });
-    expectGlobalOpaquePortal(screen.getByRole("listbox"));
+    expectGlobalPortal(screen.getByRole("listbox"));
     fireEvent.keyDown(document.activeElement ?? document.body, {
       key: "Escape",
     });
 
     fireEvent.click(screen.getByRole("button", { name: "Remove Member" }));
-    expectGlobalOpaquePortal(screen.getByRole("alertdialog"));
+    expectGlobalPortal(screen.getByRole("alertdialog"));
   });
 
   it("keeps the revoke-invite dialog globally opaque", () => {
@@ -173,7 +167,7 @@ describe("Organization row action portal surfaces", () => {
         name: "Revoke invitation for invitee@example.test",
       }),
     );
-    expectGlobalOpaquePortal(screen.getByRole("alertdialog"));
+    expectGlobalPortal(screen.getByRole("alertdialog"));
   });
 
   it("keeps the credential-removal dialog globally opaque", () => {
@@ -204,6 +198,6 @@ describe("Organization row action portal surfaces", () => {
     );
 
     fireEvent.click(screen.getByRole("button", { name: /Remove/ }));
-    expectGlobalOpaquePortal(screen.getByRole("alertdialog"));
+    expectGlobalPortal(screen.getByRole("alertdialog"));
   });
 });

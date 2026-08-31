@@ -21,14 +21,12 @@ import {
 } from "../../../../events";
 import {
   loadWakeWordEnabled,
-  saveContinuousChatMode,
-  saveOsIntentAutoStartConsent,
-  saveVadAutoStop,
   saveWakeWordEnabled,
 } from "../../../../state/persistence";
 import { useTranslation } from "../../../../state/TranslationContext.hooks";
 import { EDGE_BACKUP_VOICES, PREMADE_VOICES } from "../../../../voice/types";
 import type { VoiceContinuousMode } from "../../../../voice/voice-chat-types";
+import { voiceSettingsController } from "../../../../voice/voice-settings-controller";
 import {
   DEFAULT_ELEVEN_FAST_MODEL,
   EDGE_VOICE_GROUPS,
@@ -375,13 +373,18 @@ export function VoiceSection() {
   // without waiting on the config round-trip (same dual-store pattern as
   // VoiceSectionMount).
   const mirrorPrefs = useCallback((next: VoicePrefs) => {
-    if (next.vadAutoStopEnabled) {
-      saveVadAutoStop({ silenceMs: next.silenceMs, speechRmsThreshold: 0.01 });
-    }
-    saveContinuousChatMode(next.continuous);
-    saveOsIntentAutoStartConsent({
-      voice: next.osIntentAutoStartVoice,
-      transcription: next.osIntentAutoStartTranscription,
+    voiceSettingsController.applyDeviceSettings({
+      continuous: next.continuous,
+      osIntentAutoStartVoice: next.osIntentAutoStartVoice,
+      osIntentAutoStartTranscription: next.osIntentAutoStartTranscription,
+      ...(next.vadAutoStopEnabled
+        ? {
+            vadAutoStop: {
+              silenceMs: next.silenceMs,
+              speechRmsThreshold: 0.01,
+            },
+          }
+        : {}),
     });
   }, []);
 

@@ -181,7 +181,7 @@ describe("#14527 button-tap replay renders link-out blocks natively", () => {
 		expect(follows[0]?.content).not.toContain("[TASK:");
 	});
 
-	it("degrades the same reply to prose when no app origin is configured", async () => {
+	it("omits the dashboard-only task card when no app origin is configured", async () => {
 		const { service, channel } = makeService(undefined, {
 			channelSendable: true,
 		});
@@ -191,9 +191,10 @@ describe("#14527 button-tap replay renders link-out blocks natively", () => {
 		await handleInteractionCreate(service as never, interaction as never);
 
 		expect(interaction.followUp).toHaveBeenCalledTimes(1);
-		// No resolver URL: no fabricated dead button, and the title survives as prose.
+		// No resolver URL: no fabricated dead button; the dashboard-only task
+		// card is omitted while the ordinary acknowledgement remains.
 		expect(follows[0]?.components ?? []).toHaveLength(0);
-		expect(follows[0]?.content).toContain("Ship the release");
+		expect(follows[0]?.content).toBe("Opening your task.");
 	});
 
 	it("delivers via followUp in a group DM where channel.send is unavailable", async () => {

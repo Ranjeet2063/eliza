@@ -441,8 +441,8 @@ describe("chat/completions explicit max_tokens route behavior", () => {
     const body = (await response.json()) as {
       error: { type: string; code: string };
     };
-    expect(body.error.type).toBe("account_suspended");
-    expect(body.error.code).toBe("moderation_violation");
+    expect(body.error.type).toBe("permission_error");
+    expect(body.error.code).toBe("access_denied");
     expect(generateTextCalls).toHaveLength(0);
   });
 

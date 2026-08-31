@@ -337,15 +337,15 @@ describe("shared-utils deadline helpers", () => {
   });
 
   it("preserves timeout identity on Twitter error path (stalled body rethrows AbortError)", async () => {
-    const source = await Bun.file("packages/cloud/shared/src/lib/utils/twitter-api.ts").text();
+    const source = await Bun.file("src/lib/utils/twitter-api.ts").text();
     expect(source).toContain('cause.name === "AbortError"');
     expect(source).toContain("throw cause");
     expect(source).not.toContain("response.json().catch(() => ({}))");
   });
 
   it("routes Twilio and Blooio through the same owned helper", async () => {
-    const twilioSource = await Bun.file("packages/cloud/shared/src/lib/utils/twilio-api.ts").text();
-    const blooioSource = await Bun.file("packages/cloud/shared/src/lib/utils/blooio-api.ts").text();
+    const twilioSource = await Bun.file("src/lib/utils/twilio-api.ts").text();
+    const blooioSource = await Bun.file("src/lib/utils/blooio-api.ts").text();
     expect(twilioSource).toContain("ownedBoundedFetch");
     expect(blooioSource).toContain("ownedBoundedFetch");
   });

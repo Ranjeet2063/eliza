@@ -134,12 +134,12 @@ describe("VisionService eliza-1 IMAGE_DESCRIPTION bridge", () => {
     });
   }
 
-  it("clamps the prompt OCR to the 40-line token-budget limit", async () => {
+  it("preserves every distinct OCR line in the model prompt", async () => {
     const { runtime, useModel } = createRuntime({
       imageDescriptionResult: { description: "A long list." },
     });
     const service = new VisionService(runtime);
-    // 60 distinct short lines; without the cap the prompt would carry all 60.
+    // Model-facing OCR must remain complete rather than imposing a line cap.
     sceneWithOcr(
       service,
       Array.from({ length: 60 }, (_, i) => `row ${i}`).join("\n"),
@@ -159,16 +159,17 @@ describe("VisionService eliza-1 IMAGE_DESCRIPTION bridge", () => {
     }
     const prompt = JSON.parse(modelArgs.prompt) as { detectedText?: string };
     expect(prompt.detectedText).toBeTruthy();
-    expect((prompt.detectedText ?? "").split("\n")).toHaveLength(40);
+    expect((prompt.detectedText ?? "").split("\n")).toHaveLength(60);
+    expect(prompt.detectedText).toContain("row 59");
   });
 
-  it("clamps the prompt OCR to the 2000-char token-budget limit", async () => {
+  it("preserves OCR text beyond the retired character budget", async () => {
     const { runtime, useModel } = createRuntime({
       imageDescriptionResult: { description: "A wall of text." },
     });
     const service = new VisionService(runtime);
-    // Three distinct ~1000-char lines (~3000 chars total), under the 40-line
-    // cap but well over the 2000-char cap; without the slice it would be ~3000.
+    // Three distinct ~1000-char lines prove the retired 2000-character cap is
+    // not reintroduced on the model-facing path.
     sceneWithOcr(
       service,
       [0, 1, 2].map((i) => `${i} ${"x".repeat(1000)}`).join("\n"),
@@ -188,8 +189,8 @@ describe("VisionService eliza-1 IMAGE_DESCRIPTION bridge", () => {
     }
     const prompt = JSON.parse(modelArgs.prompt) as { detectedText?: string };
     expect(prompt.detectedText).toBeTruthy();
-    expect((prompt.detectedText ?? "").length).toBeLessThanOrEqual(2000);
-    expect((prompt.detectedText ?? "").length).toBeGreaterThan(1900);
+    expect((prompt.detectedText ?? "").length).toBeGreaterThan(3000);
+    expect((prompt.detectedText ?? "").split("\n")).toHaveLength(3);
   });
 
   it("falls through to detected-objects synthesis when IMAGE_DESCRIPTION returns the unhelpful sentinel", async () => {

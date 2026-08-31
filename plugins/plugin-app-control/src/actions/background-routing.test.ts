@@ -208,22 +208,26 @@ describe("BACKGROUND stays on the planner surface for undo/redo/reset follow-ups
 		}
 	});
 
-	it("does not hijack a genuine settings-navigation turn", () => {
+	it("does not claim a genuine settings-navigation turn", async () => {
 		// "open the settings" has no background vocabulary. The candidate-matched
-		// VIEWS must stay ranked FIRST (candidate keeps sort ahead of
-		// retrieval-override keeps), so the planner sees VIEWS as the primary
-		// tool. BACKGROUND may remain exposed lower down — every settings-context
-		// action rides the shared settings keyword — but it must not outrank the
-		// navigation action the Stage-1 candidates named.
+		// Consolidated tiering intentionally keeps every authorized action callable;
+		// relevance changes ordering and telemetry, never physical availability.
+		// Verify the navigation tool remains available and the BACKGROUND action's
+		// own validator declines this unrelated turn.
 		const { tiered } = routeTurn({
 			messageText: "open the settings",
 			candidateActions: ["OPEN_SETTINGS"],
 			selectedContexts: ["settings"],
 		});
 		const tierA = tiered.tierAParents.map((parent) => parent.name);
-		expect(tierA[0]).toBe("VIEWS");
-		if (tierA.includes("BACKGROUND")) {
-			expect(tierA.indexOf("VIEWS")).toBeLessThan(tierA.indexOf("BACKGROUND"));
-		}
+		expect(tierA).toContain("VIEWS");
+		expect(
+			await backgroundAction.validate?.(
+				{} as never,
+				{
+					content: { text: "open the settings" },
+				} as never,
+			),
+		).toBe(false);
 	});
 });

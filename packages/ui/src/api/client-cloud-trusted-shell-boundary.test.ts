@@ -15,6 +15,14 @@ const platform = vi.hoisted(() => ({
   native: false,
   request: vi.fn(),
 }));
+const desktopSecureStoreDelete = vi.hoisted(() =>
+  vi.fn(async () => {
+    // The Electrobun fixture seeds the legacy browser mirror directly; the
+    // real desktop bridge owns this deletion in protected storage.
+    window.localStorage.removeItem("steward_session_token");
+    return { ok: true as const };
+  }),
+);
 
 vi.mock("@capacitor/core", () => ({
   Capacitor: { isNativePlatform: () => platform.native },
@@ -23,6 +31,11 @@ vi.mock("@capacitor/core", () => ({
     post: vi.fn(),
     request: platform.request,
   },
+}));
+
+vi.mock("../bridge/electrobun-rpc", async (importOriginal) => ({
+  ...(await importOriginal()),
+  desktopSecureStoreDelete,
 }));
 
 import { setBootConfig } from "../config/boot-config";
@@ -141,6 +154,7 @@ function assertStewardRequests(
 beforeEach(() => {
   platform.native = false;
   platform.request.mockReset();
+  desktopSecureStoreDelete.mockClear();
   localStorage.removeItem(STEWARD_TOKEN_KEY);
   setElectrobunRuntime(false);
   setBootConfig({

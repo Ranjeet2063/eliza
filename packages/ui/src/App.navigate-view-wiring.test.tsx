@@ -313,7 +313,15 @@ vi.mock("./hooks/useAuthStatus", () => ({
   useAuthStatus: (options: { skip?: boolean } = {}) => {
     authStatusMock.use(options);
     return {
-      state: { phase: authStatusMock.phase },
+      state:
+        authStatusMock.phase === "authenticated"
+          ? {
+              phase: "authenticated",
+              identity: { id: "test-user" },
+              session: { id: "test-session" },
+              access: {},
+            }
+          : { phase: authStatusMock.phase },
       refetch: authStatusMock.refetch,
     };
   },

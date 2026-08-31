@@ -313,6 +313,13 @@ let dockerTransport = new DockerTransportRecorder();
 const requireUserOrApiKeyWithOrg = mock(async () => ({
   id: USER_ID,
   organization_id: ORGANIZATION_ID,
+  role: "owner",
+  is_active: true,
+  is_anonymous: false,
+  organization: {
+    id: ORGANIZATION_ID,
+    is_active: true,
+  },
 }));
 const isCodingContainerImageAllowed = mock(() => true);
 const imageRequiresDigestPin = mock(() => false);

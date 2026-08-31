@@ -218,6 +218,7 @@ describe("Shared reminder relative-delay runtime authority", () => {
           delivery: {
             platform: "telegram",
             project: "eliza-app",
+            connectorAccountId: "telegram:test-bot",
             chatId: "123456789",
           },
         },

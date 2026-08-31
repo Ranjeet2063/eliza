@@ -115,23 +115,25 @@ describe("ApiKeyConfig reveal deadline", () => {
     cleanup();
     vi.clearAllMocks();
     mocks.revealSecret = undefined;
+    vi.stubGlobal("fetch", mocks.clientFetch);
   });
 
   it("routes the production reveal through the canonical bounded client", async () => {
-    mocks.clientFetch.mockResolvedValue({ value: "sk-test" });
+    mocks.clientFetch.mockResolvedValue(
+      new Response(JSON.stringify({ value: "sk-test" }), { status: 200 }),
+    );
 
     await expect(
       getProductionReveal()("provider/one", "PROVIDER_API_KEY"),
     ).resolves.toBe("sk-test");
 
-    expect(mocks.clientFetch).toHaveBeenCalledWith(
-      "/api/plugins/provider%2Fone/reveal",
-      {
-        method: "POST",
-        body: JSON.stringify({ key: "PROVIDER_API_KEY" }),
-      },
-      { timeoutMs: 15_000 },
-    );
+    const [url, init] = mocks.clientFetch.mock.calls[0] ?? [];
+    expect(url).toBe("/api/plugins/provider%2Fone/reveal");
+    expect(init).toMatchObject({
+      method: "POST",
+      body: JSON.stringify({ key: "PROVIDER_API_KEY" }),
+    });
+    expect(init?.signal).toBeInstanceOf(AbortSignal);
   });
 
   it("keeps the credential masked when the bounded client rejects", async () => {
@@ -143,7 +145,9 @@ describe("ApiKeyConfig reveal deadline", () => {
   });
 
   it("rejects malformed reveal payloads without fabricating a value", async () => {
-    mocks.clientFetch.mockResolvedValue({ value: 42 });
+    mocks.clientFetch.mockResolvedValue(
+      new Response(JSON.stringify({ value: 42 }), { status: 200 }),
+    );
 
     await expect(
       getProductionReveal()("provider/one", "PROVIDER_API_KEY"),

@@ -31,6 +31,8 @@ const generateDiscordAnnouncement = mock(async () => "preview");
 const deductCredits = mock(async () => ({ success: true }));
 
 mock.module("@/api-app/lib/generative-route-auth", () => ({
+  asGenerativeCacheApiError: mock(() => null),
+  getGenerativeOperationContext: mock(() => ({})),
   requireGenerativeRouteCaller,
 }));
 mock.module("@/lib/middleware/rate-limit-hono-cloudflare", () => ({
@@ -86,6 +88,10 @@ mock.module("@/lib/services/credits", () => ({
     deductCredits,
     refundCredits: mock(async () => undefined),
   },
+}));
+mock.module("@/lib/services/generative-operation", () => ({
+  isGenerativeOperationAdmissionError: mock(() => false),
+  retainGenerativeTask: mock(async () => undefined),
 }));
 mock.module("@/lib/services/twitter-automation/app-automation", () => ({
   twitterAppAutomationService: { postAppTweet, generateAppTweet },

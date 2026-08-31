@@ -378,11 +378,14 @@ describe("0321-0328 agent sandbox replacement attempts", () => {
     const journal = (await Bun.file(journalUrl).json()) as {
       entries: Array<{ idx: number; tag: string }>;
     };
-    expect(journal.entries.at(-1)).toMatchObject({
+    const rangeEnd = journal.entries.findIndex(
+      ({ tag }) => tag === "0328_agent_sandbox_replacement_attempt_state_guard",
+    );
+    expect(journal.entries[rangeEnd]).toMatchObject({
       idx: 311,
       tag: "0328_agent_sandbox_replacement_attempt_state_guard",
     });
-    expect(journal.entries.slice(-8).map(({ tag }) => tag)).toEqual(
+    expect(journal.entries.slice(rangeEnd - 7, rangeEnd + 1).map(({ tag }) => tag)).toEqual(
       migrationUrls.map(migrationTag),
     );
 

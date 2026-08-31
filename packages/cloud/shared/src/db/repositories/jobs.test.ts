@@ -1,5 +1,6 @@
 // Exercises cloud DB jobs behavior with deterministic repository fixtures.
 import { afterEach, describe, expect, test } from "bun:test";
+import { InlinePayloadTooLargeError } from "../../lib/storage/object-store";
 import { type RuntimeR2Bucket, setRuntimeR2Bucket } from "../../lib/storage/r2-runtime-binding";
 import { prepareJobInsertData } from "./jobs";
 
@@ -76,13 +77,13 @@ describe("prepareJobInsertData", () => {
     });
   });
 
-  test("a failure dump can no longer be written whole into the error column", async () => {
+  test("rejects an oversized failure dump instead of truncating it", async () => {
     setRuntimeR2Bucket(null);
     process.env.SQL_HEAVY_PAYLOAD_STORAGE = "inline";
     process.env.SQL_HEAVY_PAYLOAD_MAX_INLINE_BYTES = "4096";
 
     const dump = "PGLITE-DUMP".repeat(5000);
-    const prepared = await prepareJobInsertData({
+    const promise = prepareJobInsertData({
       id: "44444444-4444-4444-8444-444444444444",
       type: "agent_snapshot",
       organization_id: "22222222-2222-4222-8222-222222222222",
@@ -91,11 +92,14 @@ describe("prepareJobInsertData", () => {
       error: dump,
     });
 
-    expect(prepared.error_storage).toBe("inline");
-    expect(prepared.error_key).toBeNull();
-    const stored = prepared.error ?? "";
-    expect(new TextEncoder().encode(stored).byteLength).toBeLessThanOrEqual(4096);
-    expect(stored).toContain("truncated:");
-    expect(stored.startsWith("PGLITE-DUMP")).toBe(true);
+    await expect(promise).rejects.toBeInstanceOf(InlinePayloadTooLargeError);
+    await promise.catch((error: unknown) => {
+      // error-policy:J3 the rejection is the assertion subject, not a recovery path.
+      const typed = error as InlinePayloadTooLargeError;
+      expect(typed.code).toBe("INLINE_PAYLOAD_TOO_LARGE");
+      expect(typed.field).toBe("error");
+      expect(typed.sizeBytes).toBe(55_000);
+      expect(typed.maxInlineBytes).toBe(4096);
+    });
   });
 });

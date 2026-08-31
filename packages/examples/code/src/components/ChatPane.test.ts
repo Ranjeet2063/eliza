@@ -77,6 +77,13 @@ function fmt(date: Date): string {
 
 beforeEach(() => {
   chalk.level = 0; // deterministic plain text for substring assertions
+  useStore.setState({
+    rooms: [],
+    isLoading: false,
+    isAgentTyping: false,
+    pendingSubmissions: [],
+    inputValue: "",
+  });
 });
 
 afterEach(() => {

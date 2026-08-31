@@ -1260,6 +1260,7 @@ async function sendPersonalSharedReply(
     attemptResult = await executeResponseAttempts({
       maxAttempts,
       authRefreshAttemptsOutsideBudget: 1,
+      replayPolicy: "idempotent",
       request: () => postMessage(authHeader),
       refreshAuth: async () => {
         authHeader = await reauth();
@@ -1267,6 +1268,16 @@ async function sendPersonalSharedReply(
       retryStatuses: !isLongTurn,
       retryTransport: !isLongTurn,
       retryDelayCapMs: PERSONAL_SHARED_RETRY_DELAY_CAP_MS,
+      reportObservationError: (error, observation) => {
+        logger.warn("Personal Shared Cloud attempt observation failed", {
+          traceId,
+          project,
+          platform: adapter.platform,
+          messageId: event.messageId,
+          attempt: observation.attempt,
+          error: error instanceof Error ? error.message : String(error),
+        });
+      },
       observe: (observation) => {
         const response = observation.response;
         const attemptContext = {

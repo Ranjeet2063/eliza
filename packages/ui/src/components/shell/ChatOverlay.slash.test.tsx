@@ -226,23 +226,22 @@ describe("ChatOverlay slash commands", () => {
     expect(input.value).toBe("");
   });
 
-  it("natural navigation stays inert when the feature flag is off", () => {
+  it("optimistically navigates while preserving the agent send when the feature flag is off", () => {
     const slash = makeSlash();
     const { input, controller } = renderOverlay(slash);
     fireEvent.change(input, { target: { value: "open settings" } });
     fireEvent.keyDown(input, { key: "Enter" });
     expect(controller.send).toHaveBeenCalledWith("open settings");
-    expect(slash.navigateSettings).not.toHaveBeenCalled();
+    expect(slash.navigateSettings).toHaveBeenCalledWith(undefined);
   });
 
-  it("feature-flagged natural navigation runs through the client command path", () => {
+  it("feature-flagged natural navigation preserves the optimistic agent send", () => {
     const slash = makeSlash({ naturalShortcutsEnabled: true });
     const { input, controller } = renderOverlay(slash);
     fireEvent.change(input, { target: { value: "open settings" } });
     fireEvent.keyDown(input, { key: "Enter" });
     expect(slash.navigateSettings).toHaveBeenCalledWith(undefined);
-    expect(controller.send).not.toHaveBeenCalled();
-    expect(input.value).toBe("");
+    expect(controller.send).toHaveBeenCalledWith("open settings");
   });
 
   it("Enter on an agent command sends the slash text", () => {

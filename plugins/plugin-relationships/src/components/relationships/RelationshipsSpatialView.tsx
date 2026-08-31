@@ -22,8 +22,9 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
 } from "@elizaos/ui";
+import { useAgentElement } from "@elizaos/ui/agent-surface";
 import { PagePanel } from "@elizaos/ui/components/composites/page-panel";
-import { useState } from "react";
+import { type ComponentProps, useState } from "react";
 
 /** A typed edge shown under its source entity, already projected for display. */
 export interface RelationshipEdge {
@@ -86,6 +87,40 @@ export interface RelationshipsSpatialViewProps {
   onAction?: (action: string) => void;
 }
 
+function RelationshipActionButton({
+  agentId,
+  agentLabel,
+  ...props
+}: ComponentProps<typeof Button> & {
+  agentId: string;
+  agentLabel: string;
+}) {
+  const { ref, agentProps } = useAgentElement<HTMLButtonElement>({
+    id: agentId,
+    role: "button",
+    label: agentLabel,
+    group: "relationships",
+  });
+  return <Button ref={ref} {...agentProps} {...props} />;
+}
+
+function RelationshipFilterItem({
+  agentId,
+  agentLabel,
+  ...props
+}: ComponentProps<typeof DropdownMenuRadioItem> & {
+  agentId: string;
+  agentLabel: string;
+}) {
+  const { ref, agentProps } = useAgentElement<HTMLDivElement>({
+    id: agentId,
+    role: "menu-item",
+    label: agentLabel,
+    group: "relationship-filters",
+  });
+  return <DropdownMenuRadioItem ref={ref} {...agentProps} {...props} />;
+}
+
 export function RelationshipsSpatialView({
   snapshot,
   onAction,
@@ -109,9 +144,14 @@ export function RelationshipsSpatialView({
           title="Could not load relationships"
           description={snapshot.error ?? "Could not load relationships."}
           action={
-            <Button size="sm" data-agent-id="retry" onClick={dispatch("retry")}>
+            <RelationshipActionButton
+              size="sm"
+              agentId="retry"
+              agentLabel="Retry"
+              onClick={dispatch("retry")}
+            >
               Retry
-            </Button>
+            </RelationshipActionButton>
           }
         />
       ) : snapshot.state === "empty" ? (
@@ -121,9 +161,14 @@ export function RelationshipsSpatialView({
           title="No relationships yet"
           description="Add a person to start building the relationship graph."
           action={
-            <Button size="sm" data-agent-id="add" onClick={dispatch("add")}>
+            <RelationshipActionButton
+              size="sm"
+              agentId="add"
+              agentLabel="Add someone"
+              onClick={dispatch("add")}
+            >
               Add someone
-            </Button>
+            </RelationshipActionButton>
           }
         />
       ) : (
@@ -197,17 +242,18 @@ function KindFilters({
       <span className="text-sm text-muted">Type</span>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button
+          <RelationshipActionButton
             type="button"
             size="dense"
             variant="ghostMuted"
             className="min-w-32 justify-between"
-            data-agent-id="relationships-kind-filter"
+            agentId="relationships-kind-filter"
+            agentLabel={`Filter relationship type, ${selectedLabel} selected`}
             aria-label={`Filter relationship type, ${selectedLabel} selected`}
           >
             <span>{selectedLabel}</span>
             <span aria-hidden="true">▾</span>
-          </Button>
+          </RelationshipActionButton>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="min-w-48">
           <DropdownMenuLabel>Filter by type</DropdownMenuLabel>
@@ -217,20 +263,22 @@ function KindFilters({
               onSelect(value === allKindsValue ? "" : value)
             }
           >
-            <DropdownMenuRadioItem
+            <RelationshipFilterItem
               value={allKindsValue}
-              data-agent-id="relationships-kind-all"
+              agentId="relationships-kind-all"
+              agentLabel="All"
             >
               All
-            </DropdownMenuRadioItem>
+            </RelationshipFilterItem>
             {filters.map((filter) => (
-              <DropdownMenuRadioItem
+              <RelationshipFilterItem
                 key={filter.kind}
                 value={filter.kind}
-                data-agent-id={`relationships-kind-${filter.kind}`}
+                agentId={`relationships-kind-${filter.kind}`}
+                agentLabel={filter.label}
               >
                 {filter.label}
-              </DropdownMenuRadioItem>
+              </RelationshipFilterItem>
             ))}
           </DropdownMenuRadioGroup>
         </DropdownMenuContent>
@@ -260,15 +308,16 @@ function EntityNodeBlock({
           ) : null}
         </div>
         <span className="shrink-0 text-xs text-muted">{node.kindLabel}</span>
-        <Button
+        <RelationshipActionButton
           variant="ghost"
           size="icon-sm"
           aria-label={`Open ${node.name}`}
-          data-agent-id={`open-${node.id}`}
+          agentId={`open-${node.id}`}
+          agentLabel={`Open ${node.name}`}
           onClick={() => onAction?.(`open:${node.id}`)}
         >
           ›
-        </Button>
+        </RelationshipActionButton>
       </div>
       {node.edges.length > 0
         ? node.edges.map((edge) => (

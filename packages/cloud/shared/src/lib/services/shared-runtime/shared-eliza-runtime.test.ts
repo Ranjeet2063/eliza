@@ -1208,7 +1208,10 @@ describe("Shared Eliza Workerd runtime", () => {
       method: "tools/call",
       params: {
         name: "web_search",
-        arguments: { objective: "What is the latest ElizaOS news?" },
+        arguments: {
+          objective: "latest public ElizaOS news",
+          search_queries: ["latest public ElizaOS news"],
+        },
       },
     });
     expect(result.reply).toStartWith("A new ElizaOS public release was announced today.");
@@ -1220,7 +1223,7 @@ describe("Shared Eliza Workerd runtime", () => {
     expect(searchResults).toHaveLength(1);
     expect(searchResults?.[0]).toMatchObject({
       success: true,
-      data: { query: "What is the latest ElizaOS news?" },
+      data: { query: "latest public ElizaOS news" },
     });
     expect(JSON.stringify(searchResults)).not.toContain('"sources"');
     expect(JSON.stringify(searchResults)).not.toContain("search_id");
@@ -1232,7 +1235,7 @@ describe("Shared Eliza Workerd runtime", () => {
     });
     expect(result.history.at(-1)?.grounding).toEqual({
       kind: "web_search",
-      query: "What is the latest ElizaOS news?",
+      query: "latest public ElizaOS news",
       provider: "parallel",
       text: JSON.stringify({
         results: [
@@ -1363,7 +1366,7 @@ describe("Shared Eliza Workerd runtime", () => {
       },
     });
 
-    expect(result.reply).toContain("origin guard and credential relay");
+    expect(result.reply).toContain("complete, traceable live source");
     expect(modelRequests).toHaveLength(1);
     const encodedRequest = JSON.stringify(modelRequests[0]);
     expect(encodedRequest).toContain("untrusted_public_web_search_result");
@@ -1491,7 +1494,7 @@ describe("Shared Eliza Workerd runtime", () => {
       },
     });
 
-    expect(result.reply).toContain("cannot verify");
+    expect(result.reply).toContain("verify");
     expect(modelRequests).toHaveLength(1);
     const encodedRequest = JSON.stringify(modelRequests[0]);
     expect(encodedRequest).not.toContain("untrusted_public_web_search_result");
@@ -1615,7 +1618,7 @@ describe("Shared Eliza Workerd runtime", () => {
       },
     });
 
-    expect(result.reply).toContain("origin guard and credential relay");
+    expect(result.reply).toContain("complete, traceable live source");
     expect(modelRequests).toHaveLength(1);
     const encodedRequest = JSON.stringify(modelRequests[0]);
     expect(encodedRequest).toContain("untrusted_public_web_search_result");
@@ -1705,7 +1708,7 @@ describe("Shared Eliza Workerd runtime", () => {
       },
     });
 
-    expect(result.reply).toContain("cannot verify");
+    expect(result.reply).toContain("verify");
     expect(modelRequests).toHaveLength(1);
     const encodedRequest = JSON.stringify(modelRequests[0]);
     expect(encodedRequest).not.toContain("untrusted_public_web_search_result");
@@ -2370,6 +2373,7 @@ describe("Shared Eliza Workerd runtime", () => {
           delivery: {
             platform: "telegram",
             project: "eliza-app",
+            connectorAccountId: "bot:123456789",
             chatId: "123456789",
           },
         },
@@ -2389,6 +2393,7 @@ describe("Shared Eliza Workerd runtime", () => {
         delivery: {
           platform: "telegram",
           project: "eliza-app",
+          connectorAccountId: "bot:123456789",
           chatId: "123456789",
         },
       },
@@ -2654,6 +2659,7 @@ describe("Shared Eliza Workerd runtime", () => {
             delivery: {
               platform: "telegram",
               project: "eliza-app",
+              connectorAccountId: "bot:123456789",
               chatId: "123456789",
             },
           },

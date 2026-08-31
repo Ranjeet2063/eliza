@@ -123,6 +123,10 @@ vi.mock("@elizaos/ui/auth-status", () => ({
     captureLifeOpsActivitySignal: h.captureLifeOpsActivitySignal,
   },
   isApiError: h.isApiError,
+  getAuthStatusSnapshot: () => ({
+    phase: "authenticated",
+    access: { role: "OWNER" },
+  }),
   isAuthenticatedNow: h.isAuthenticatedNow,
   isElectrobunRuntime: h.isElectrobunRuntime,
   loadDesktopWorkspaceSnapshot: h.loadDesktopWorkspaceSnapshot,

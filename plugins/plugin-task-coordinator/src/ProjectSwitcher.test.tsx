@@ -40,9 +40,25 @@ vi.mock("@elizaos/ui/agent-surface", () => ({
   useAgentElement: () => ({ ref: () => {}, agentProps: {} }),
 }));
 
-// Render the dropdown inline: trigger + content are always mounted so items are
-// queryable without simulating the Radix portal open sequence.
-vi.mock("@elizaos/ui/components/ui/dropdown-menu", () => ({
+// Full mock (no importOriginal): the switcher only touches `client`,
+// `useAppSelectorShallow`, and `Button`, so stub them and keep @elizaos/core
+// out of the browser test graph (mirrors use-orchestrator-data.test.ts).
+vi.mock("@elizaos/ui/api", () => ({
+  client: {
+    listProjects: () => calls.listProjects(),
+    activateProject: (id: string) => calls.activateProject(id),
+  },
+}));
+
+vi.mock("@elizaos/ui", () => ({
+  Button: ({
+    children,
+    ...rest
+  }: { children: ReactNode } & Record<string, unknown>) => (
+    <button type="button" {...rest}>
+      {children}
+    </button>
+  ),
   DropdownMenu: ({ children }: { children: ReactNode }) => (
     <div>{children}</div>
   ),
@@ -65,24 +81,6 @@ vi.mock("@elizaos/ui/components/ui/dropdown-menu", () => ({
     onSelect?: () => void;
   } & Record<string, unknown>) => (
     <button type="button" onClick={() => onSelect?.()} {...rest}>
-      {children}
-    </button>
-  ),
-}));
-
-// Full mock (no importOriginal): the switcher only touches `client`,
-// `useAppSelectorShallow`, and `Button`, so stub them and keep @elizaos/core
-// out of the browser test graph (mirrors use-orchestrator-data.test.ts).
-vi.mock("@elizaos/ui", () => ({
-  client: {
-    listProjects: () => calls.listProjects(),
-    activateProject: (id: string) => calls.activateProject(id),
-  },
-  Button: ({
-    children,
-    ...rest
-  }: { children: ReactNode } & Record<string, unknown>) => (
-    <button type="button" {...rest}>
       {children}
     </button>
   ),

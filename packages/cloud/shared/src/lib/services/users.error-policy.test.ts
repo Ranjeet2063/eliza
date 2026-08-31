@@ -40,6 +40,7 @@ mock.module("../utils/logger", () => ({
 }));
 
 mock.module("./inference-auth-cache", () => ({
+  invalidateInferenceAuthContextByKeyHash: mock(async () => undefined),
   invalidateInferenceAuthContextsByKeyHashes: mock(async () => undefined),
   invalidateInferenceSessionAuthContexts: mock(async () => undefined),
 }));

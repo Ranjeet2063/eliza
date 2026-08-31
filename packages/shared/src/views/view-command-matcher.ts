@@ -237,6 +237,12 @@ const VIEW_NOUNS: Record<string, readonly string[]> = {
     "stored secrets",
     "stored credentials",
   ],
+  "pendant-transcript": [
+    "pendant transcript",
+    "pendant transcripts",
+    "pendant voice transcript",
+    "pendant recording transcript",
+  ],
   transcripts: [
     "transcripts",
     "transcript",
@@ -572,13 +578,12 @@ const VIEW_NOUNS: Record<string, readonly string[]> = {
     "ghi chú",
     "ghi chu",
   ],
+  files: ["files", "file", "stored files", "uploaded files"],
   documents: [
     "documents",
     "document",
     ...Object.values(DOCUMENTS_NAV_VOCABULARY.localizedLabels),
     ...DOCUMENTS_NAV_VOCABULARY.aliases,
-    "files",
-    "file",
     "docs",
     "papers",
     "documentos",
@@ -681,6 +686,7 @@ const VIEW_NOUNS: Record<string, readonly string[]> = {
     "trò chuyện",
     "tro chuyen",
   ],
+  stream: ["stream", "activity stream", "live activity stream"],
   cockpit: [
     "cockpit",
     "coding cockpit",
@@ -866,9 +872,12 @@ const VIEW_NOUNS: Record<string, readonly string[]> = {
 const VIEW_PRIORITY = [
   "cockpit",
   "task-coordinator",
+  "pendant-transcript",
+  "stream",
   "finances",
   "relationships",
   "automations",
+  "files",
   "documents",
   "memories",
   "transcripts",

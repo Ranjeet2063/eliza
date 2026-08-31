@@ -265,6 +265,7 @@ export {
   selectUserAuthorizedRecurrence,
   textStatesExplicitRecurrence,
 } from "./i18n/recurrence-markers.js";
+export * from "./integration-observability.js";
 // Knowledge-graph primitives — canonical Entity/Relationship types + the
 // identity-merge engine. Dependency-free; the DB-backed stores stay in
 // @elizaos/plugin-personal-assistant.
@@ -283,6 +284,7 @@ export * from "./lifeops-normalize/index.js";
 // Server runtime (KV cache, llama-server lifecycle, etc.) stays in @elizaos/app-core.
 export * from "./local-inference/index.js";
 export * from "./loopback-trust.js";
+export * from "./mcp/index.js";
 export * from "./meeting-artifacts.js";
 export * from "./meetings.js";
 export * from "./platform/eliza-os.js";
@@ -312,6 +314,7 @@ export * from "./utils/browser-tab-kit-types.js";
 export * from "./utils/browser-tabs-renderer-registry.js";
 export * from "./utils/character-message-examples.js";
 export * from "./utils/cloud-status.js";
+export * from "./utils/deadline.js";
 export * from "./utils/documents-upload-image.js";
 export * from "./utils/eliza-cloud-model-route.js";
 export * from "./utils/eliza-globals.js";

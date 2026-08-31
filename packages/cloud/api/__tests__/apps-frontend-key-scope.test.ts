@@ -78,6 +78,25 @@ mock.module("@/lib/auth", () => ({
   }),
 }));
 
+// Review submission uses the canonical generative-auth decision rather than
+// the raw auth helper. Preserve the real module and supply the app scope that
+// the combined auth snapshot carries for app-minted keys.
+const generativeRouteAuthActual = await import(
+  "../src/lib/generative-route-auth"
+);
+mock.module("@/api-app/lib/generative-route-auth", () => ({
+  ...generativeRouteAuthActual,
+  requireGenerativeRouteCaller: async () => ({
+    user: { id: USER, organization_id: ORG },
+    apiKeyId: currentApiKeyId ?? null,
+    authSource: "combined_cache" as const,
+    appScopeId:
+      Object.values(APPS).find(
+        (candidate) => candidate.api_key_id === currentApiKeyId,
+      )?.id ?? null,
+  }),
+}));
+
 mock.module("@/lib/middleware/rate-limit-hono-cloudflare", () => ({
   RateLimitPresets: { CRITICAL: {} },
   rateLimit: () => async (_c: unknown, next: () => Promise<void>) => next(),

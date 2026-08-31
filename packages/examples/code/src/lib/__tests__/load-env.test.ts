@@ -1,14 +1,14 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, mock } from "bun:test";
 
-const mocks = vi.hoisted(() => ({
-  existsSync: vi.fn(),
-  config: vi.fn(),
-}));
+const mocks = {
+  existsSync: mock(),
+  config: mock(),
+};
 
-vi.mock("node:fs", () => ({ existsSync: mocks.existsSync }));
-vi.mock("dotenv", () => ({ config: mocks.config }));
+mock.module("node:fs", () => ({ existsSync: mocks.existsSync }));
+mock.module("dotenv", () => ({ config: mocks.config }));
 
-import { loadEnv } from "../load-env.ts";
+const { loadEnv } = await import("../load-env.ts");
 
 describe("loadEnv", () => {
   beforeEach(() => {

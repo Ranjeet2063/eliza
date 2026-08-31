@@ -33,6 +33,7 @@ import { pushSchema } from "drizzle-kit/api";
 import { closeDatabaseConnectionsForTests, dbWrite } from "../../db/client";
 import { resetKmsClientForTests } from "../../db/crypto/kms-client";
 import { agentSandboxesRepository } from "../../db/repositories/agent-sandboxes";
+import { agentNodeIncarnationHistories } from "../../db/schemas/agent-node-incarnation-histories";
 import {
   type AgentBackupFileEntry,
   type AgentBackupFileSet,
@@ -197,6 +198,21 @@ async function seedScheduledCatalogV2Placeholder(sandboxRecordId: string): Promi
     .values({ organization_id: sandbox.organizationId, agent_id: sandboxRecordId })
     .onConflictDoNothing();
 
+  const sourceNodeRecordId = randomUUID();
+  const sourceNodeIncarnation = randomUUID();
+  const [sourceOccurrence] = await dbWrite
+    .insert(agentNodeIncarnationHistories)
+    .values({
+      docker_node_record_id: sourceNodeRecordId,
+      node_id: "node-verifier-fixture-1",
+      node_incarnation: sourceNodeIncarnation,
+      fleet_kind: "robot",
+      infrastructure_provider: "hetzner",
+      host_key_fingerprint: "sha256:verifier-fixture",
+    })
+    .returning({ id: agentNodeIncarnationHistories.id });
+  if (!sourceOccurrence) throw new Error("source occurrence fixture was not inserted");
+
   const [backup] = await dbWrite
     .insert(agentSandboxBackups)
     .values({
@@ -215,9 +231,10 @@ async function seedScheduledCatalogV2Placeholder(sandboxRecordId: string): Promi
       lifecycle_generation: randomUUID(),
       lifecycle_revision: 0n,
       source_provider: "operator-onboarded",
-      source_node_record_id: randomUUID(),
+      source_node_record_id: sourceNodeRecordId,
       source_node_id: "node-verifier-fixture-1",
-      source_node_incarnation: randomUUID(),
+      source_node_incarnation: sourceNodeIncarnation,
+      source_node_history_id: sourceOccurrence.id,
       source_provider_handle: "verifier-fixture-handle",
       source_container_id: "b".repeat(64),
       retention_reason: "schedule",
@@ -327,6 +344,7 @@ beforeAll(async () => {
       organizations,
       users,
       userCharacters,
+      agentNodeIncarnationHistories,
       agentSandboxes,
       agentBackupCatalogAuthorities,
       agentSandboxBackups,

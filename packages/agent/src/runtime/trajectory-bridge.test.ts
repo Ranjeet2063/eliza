@@ -1332,7 +1332,7 @@ describe("installDatabaseTrajectoryLogger (capture bridge)", () => {
 
   // This large serialization fixture can contend with parallel Vitest batches
   // on shared runners, so retain the explicit timeout.
-  it("preserves large bridge-owned captures while normalizing cycles and depth", {
+  it("preserves large bridge-owned captures while normalizing cycles", {
     timeout: 300_000,
   }, async () => {
     const { runtime, logger, execute } = makeRuntime();
@@ -1436,7 +1436,7 @@ describe("installDatabaseTrajectoryLogger (capture bridge)", () => {
     expect(joinedWrites).toMatch(/x{70000}/);
     expect(joinedWrites).toContain(JSON.stringify(oversizedArray));
     expect(joinedWrites).toContain("[Circular]");
-    expect(joinedWrites).toContain("[MaxDepth]");
+    expect(joinedWrites).not.toContain("[MaxDepth]");
     expect(joinedWrites).not.toContain("...[truncated]");
     expect(joinedWrites).not.toContain('"__truncatedItems"');
   });

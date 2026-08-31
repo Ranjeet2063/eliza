@@ -96,6 +96,7 @@ describe("executeBrowserAutofillLogin", () => {
     const result = await executeBrowserAutofillLogin({} as never, undefined, {
       parameters: {
         domain: "example.com",
+        username: "alice",
       },
     });
 

@@ -846,7 +846,7 @@ describe("mock-cloud connect e2e — dedicated cold boot + shared chat bridge", 
         authToken: "wrong-token",
         name: "Eliza",
       }),
-    ).rejects.toThrow(/unauthorized|find your agents/i);
+    ).rejects.toThrow(/Cloud request failed \(401\)/i);
     // No create POST reached the control plane.
     expect(
       state.requests.filter(

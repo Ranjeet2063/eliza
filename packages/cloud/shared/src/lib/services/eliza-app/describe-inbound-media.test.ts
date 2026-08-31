@@ -175,7 +175,7 @@ describe("describeInboundImageMedia — enrichment path", () => {
           { type: "text"; text: string } | { type: "image"; image: Uint8Array; mediaType: string }
         >;
       }>;
-      maxOutputTokens: number;
+      maxOutputTokens?: number;
     };
     expect(options.messages).toHaveLength(1);
     const [textPart, imageA, imageB] = options.messages[0].content;
@@ -190,7 +190,7 @@ describe("describeInboundImageMedia — enrichment path", () => {
       image: bytesB,
       mediaType: "image/png",
     });
-    expect(options.maxOutputTokens).toBeGreaterThan(0);
+    expect(options.maxOutputTokens).toBeUndefined();
   });
 
   test("every media fetch forbids redirects so hops cannot leave the allowlist", async () => {

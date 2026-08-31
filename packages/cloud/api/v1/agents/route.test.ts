@@ -412,9 +412,24 @@ describe("service agent provisioning route", () => {
       cloudAgentId: "cloud-agent-1",
       characterId: "character-1",
       containerId: "container-worker",
-      containerUrl: "https://runtime.example.test",
-      bridgeUrl: "https://runtime.example.test",
+      containerUrl: "https://cloud-agent-1.cloud.eliza.app",
+      bridgeUrl: "https://cloud-agent-1.cloud.eliza.app",
+      webUiUrl: "https://cloud-agent-1.cloud.eliza.app",
       status: "running",
+      token_address: "0x0000000000000000000000000000000000000009",
+      token_chain: "bsc",
+      token_name: "Waifu Smoke",
+      token_ticker: "WSMOKE",
+      account: {
+        primaryWalletAddress: "0x0000000000000000000000000000000000000001",
+        walletKeyRef: null,
+        organizationId: "agent-wallet-org",
+        userId: "agent-wallet-user",
+        isNewAccount: true,
+        initialCreditsGranted: true,
+        initialFreeCreditsUsd: 5,
+        welcomeBonusWithheld: false,
+      },
     });
     expect(createAgent).toHaveBeenCalledWith(
       expect.objectContaining({

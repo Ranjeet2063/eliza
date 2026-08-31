@@ -101,6 +101,12 @@ describe("LifeOps Google plugin registration", () => {
     );
   });
 
+  it("declares the canonical PDF service required by complete agreement ingestion", () => {
+    expect(personalAssistantPlugin.dependencies).toContain(
+      "@elizaos/plugin-pdf",
+    );
+  });
+
   it("registers plugin-google-workspace when LifeOps is registered directly", async () => {
     const { runtime, plugins, registerPlugin } =
       createRuntimeWithPluginRegistration();

@@ -410,7 +410,7 @@ describe("telegramAdapter.extractEvent", () => {
     expect(fetches).toBe(0);
   });
 
-  test("does not treat a Crockford-invalid code as a link command", async () => {
+  test("does not treat a product-alphabet-invalid code as a link command", async () => {
     let fetches = 0;
     globalThis.fetch = mock(async () => {
       fetches += 1;
@@ -423,12 +423,12 @@ describe("telegramAdapter.extractEvent", () => {
     );
 
     expect(fetches).toBe(0);
-    // "01ABCDEF" contains 0 and 1, which Crockford base32 excludes
-    // (TELEGRAM_GROUP_LINK_COMMAND uses [2-9A-HJ-NP-Z]{8}), so this is not a
-    // link command and falls through to an ambient group turn.
+    // The shared Telegram parser still classifies slash-prefixed text as a
+    // command. Link handling is distinguished by the absence of an authority
+    // lookup and role, not by rewriting the transport-level invocation kind.
     expect(event).toMatchObject({
       text: "/eliza_link 01ABCDEF",
-      groupInvocation: "ambient",
+      groupInvocation: "command",
       isCommand: true,
     });
     expect(event?.groupActorRole).toBeUndefined();

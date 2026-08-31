@@ -5,7 +5,7 @@ import { jobsRepository } from "../../db/repositories/jobs";
 import type { Job } from "../../db/schemas/jobs";
 import { elizaSandboxService } from "./eliza-sandbox";
 import { JOB_TYPES, type ProvisioningJobType } from "./provisioning-job-types";
-import { provisioningJobService } from "./provisioning-jobs";
+import { ProvisioningJobService } from "./provisioning-jobs";
 
 const ORG = "22222222-2222-4222-8222-222222222222";
 const AGENT = "e06bb509-6c52-4c33-a9f7-66addc43e8c8";
@@ -19,6 +19,10 @@ const EMPTY_RECOVERY = {
   unchanged: 0,
   failures: [],
 };
+const provisioningJobService = new ProvisioningJobService({
+  acquireProviderAdmission: async () => true,
+  releaseProviderAdmission: async () => undefined,
+});
 
 function makeDowngradeJob(): Job {
   const now = new Date("2026-06-20T00:00:00.000Z");
@@ -145,11 +149,14 @@ describe("ProvisioningJobService agent_downgrade", () => {
       expect(ctx.updateStatusSpy).not.toHaveBeenCalledWith(ctx.job, "completed", expect.anything());
       expect(ctx.incrementSpy).toHaveBeenCalledWith(
         ctx.job.id,
-        "No pre-upgrade snapshot found; refusing rollback without restore point",
+        expect.stringContaining(
+          "No pre-upgrade snapshot found; refusing rollback without restore point",
+        ),
         ctx.job.max_attempts,
         undefined,
         ctx.job.execution_generation,
         expect.any(String),
+        undefined,
       );
     } finally {
       svcSpy.mockRestore();

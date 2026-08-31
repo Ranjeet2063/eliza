@@ -46,7 +46,7 @@ describe("Anthropic native text plumbing", () => {
     await expect(
       handleTextSmall(createRuntime(), { prompt: "complete this" })
     ).rejects.toMatchObject({
-      cause: expect.objectContaining({ code: "MODEL_OUTPUT_INCOMPLETE" }),
+      code: "MODEL_OUTPUT_INCOMPLETE",
     });
   }, 60_000);
 
