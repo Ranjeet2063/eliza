@@ -29,6 +29,7 @@ const incrementUsageCalls: string[] = [];
 const authBoundaryCalls: string[] = [];
 const moderationBypassCacheCalls: boolean[] = [];
 const ADMISSION = {
+  subscriptionFunded: false,
   balance: { balanceUsd: 100, balanceAt: 1, balanceRevision: "1" },
   rateLimits: {
     completionsRpm: 60,
@@ -781,7 +782,7 @@ describe("isInferenceAuthContext shape guard", () => {
     expect(isInferenceAuthContext(null)).toBe(false);
     expect(
       isInferenceAuthContext({
-        v: 2,
+        v: 3,
         userId: "u",
         orgId: "o",
         apiKeyId: "k",
@@ -793,7 +794,7 @@ describe("isInferenceAuthContext shape guard", () => {
     expect(isInferenceAuthContext({ v: 1, userId: "u" })).toBe(false);
     expect(
       isInferenceAuthContext({
-        v: 2,
+        v: 3,
         cachedAt: 1,
         userId: "u",
         orgId: "o",
